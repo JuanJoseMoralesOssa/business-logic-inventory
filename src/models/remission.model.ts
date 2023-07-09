@@ -15,7 +15,6 @@ export class Remission extends Entity {
   })
   remission: number;
 
-
   constructor(data?: Partial<Remission>) {
     super(data);
   }

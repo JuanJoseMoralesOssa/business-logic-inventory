@@ -1,7 +1,7 @@
 import {inject} from '@loopback/core';
 import {DefaultCrudRepository} from '@loopback/repository';
 import {MysqlDataSource} from '../datasources';
-import {Bill, BillRelations} from '../models';
+import {Bill, BillRelations, Sale} from '../models';
 
 export class BillRepository extends DefaultCrudRepository<
   Bill,

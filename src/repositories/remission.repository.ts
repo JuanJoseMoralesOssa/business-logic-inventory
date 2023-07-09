@@ -1,7 +1,7 @@
 import {inject} from '@loopback/core';
 import {DefaultCrudRepository} from '@loopback/repository';
 import {MysqlDataSource} from '../datasources';
-import {Remission, RemissionRelations} from '../models';
+import {Remission, RemissionRelations, Sale} from '../models';
 
 export class RemissionRepository extends DefaultCrudRepository<
   Remission,

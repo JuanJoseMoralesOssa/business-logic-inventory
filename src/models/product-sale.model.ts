@@ -21,6 +21,15 @@ export class ProductSale extends Entity {
   })
   weight: number;
 
+  @property({
+    type: 'number',
+  })
+  productId?: number;
+
+  @property({
+    type: 'number',
+  })
+  saleId?: number;
 
   constructor(data?: Partial<ProductSale>) {
     super(data);
