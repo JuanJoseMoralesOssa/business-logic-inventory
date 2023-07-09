@@ -16,6 +16,9 @@ export class Bill extends Entity {
   })
   bill: number;
 
+  @hasOne(() => Sale)
+  sale: Sale;
+
   constructor(data?: Partial<Bill>) {
     super(data);
   }

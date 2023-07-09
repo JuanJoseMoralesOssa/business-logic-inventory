@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, hasOne} from '@loopback/repository';
+import {Sale} from './sale.model';
 
 @model()
 export class Remission extends Entity {
@@ -14,6 +15,9 @@ export class Remission extends Entity {
     required: true,
   })
   remission: number;
+
+  @hasOne(() => Sale)
+  sale: Sale;
 
   constructor(data?: Partial<Remission>) {
     super(data);
