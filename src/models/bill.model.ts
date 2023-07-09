@@ -1,0 +1,28 @@
+import {Entity, model, property} from '@loopback/repository';
+
+@model()
+export class Bill extends Entity {
+  @property({
+    type: 'number',
+    id: true,
+    generated: true,
+  })
+  id?: number;
+
+  @property({
+    type: 'number',
+    required: true,
+  })
+  bill: number;
+
+
+  constructor(data?: Partial<Bill>) {
+    super(data);
+  }
+}
+
+export interface BillRelations {
+  // describe navigational properties here
+}
+
+export type BillWithRelations = Bill & BillRelations;
