@@ -2,7 +2,19 @@ import {Entity, model, property, hasMany} from '@loopback/repository';
 import {Sale} from './sale.model';
 import {ProductSale} from './product-sale.model';
 
-@model()
+@model({
+  settings: {
+    foreignKeys:
+      {
+        fk_product_packingId: {
+          name: "fk_product_packingId",
+          entity: "Packing",
+          entityKey: "id",
+          foreignKey: "packingId",
+        }
+      },
+  }
+})
 export class Product extends Entity {
   @property({
     type: 'number',
@@ -10,6 +22,12 @@ export class Product extends Entity {
     generated: true,
   })
   id?: number;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  code?: string;
 
   @property({
     type: 'string',

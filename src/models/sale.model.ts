@@ -5,7 +5,30 @@ import {ProductSale} from './product-sale.model';
 import {Bill} from './bill.model';
 import {Remission} from './remission.model';
 
-@model()
+@model({
+  settings: {
+    foreignKeys: {
+      fk_sale_clientId: {
+        name: "fk_sale_clientId",
+        entity: "Client",
+        entityKey: "id",
+        foreignKey: "clientId",
+      },
+      fk_sale_billId: {
+        name: "fk_sale_billId",
+        entity: "Bill",
+        entityKey: "id",
+        foreignKey: "billId",
+      },
+      fk_sale_remissionId: {
+        name: "fk_sale_remissionId",
+        entity: "Remission",
+        entityKey: "id",
+        foreignKey: "remissionId",
+      },
+    }
+  }
+})
 export class Sale extends Entity {
   @property({
     type: 'number',

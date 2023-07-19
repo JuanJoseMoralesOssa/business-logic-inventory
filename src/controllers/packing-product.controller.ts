@@ -42,7 +42,8 @@ export class PackingProductController {
     @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter<Product>,
   ): Promise<Product[]> {
-    return this.packingRepository.products(id).find(filter);
+    let idint = parseInt(id);
+    return this.packingRepository.products(idint).find(filter);
   }
 
   @post('/packings/{id}/products', {
@@ -90,7 +91,8 @@ export class PackingProductController {
     product: Partial<Product>,
     @param.query.object('where', getWhereSchemaFor(Product)) where?: Where<Product>,
   ): Promise<Count> {
-    return this.packingRepository.products(id).patch(product, where);
+    let idint = parseInt(id);
+    return this.packingRepository.products(idint).patch(product, where);
   }
 
   @del('/packings/{id}/products', {
@@ -105,6 +107,7 @@ export class PackingProductController {
     @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Product)) where?: Where<Product>,
   ): Promise<Count> {
-    return this.packingRepository.products(id).delete(where);
+    let idint = parseInt(id);
+    return this.packingRepository.products(idint).delete(where);
   }
 }
