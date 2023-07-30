@@ -33,6 +33,6 @@ export class SaleRemissionController {
   async getRemission(
     @param.path.number('id') id: typeof Sale.prototype.id,
   ): Promise<Remission> {
-    return this.saleRepository.remission(id);
+    return this.saleRepository.remissionNum(id);
   }
 }

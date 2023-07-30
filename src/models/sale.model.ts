@@ -8,6 +8,12 @@ import {Remission} from './remission.model';
 @model({
   settings: {
     foreignKeys: {
+      fk_sale_remissionNumId: {
+        name: "fk_sale_remissionNumId",
+        entity: "Remission",
+        entityKey: "id",
+        foreignKey: "remissionNumId",
+      },
       fk_sale_clientId: {
         name: "fk_sale_clientId",
         entity: "Client",
@@ -43,10 +49,7 @@ export class Sale extends Entity {
   })
   saleDate: string;
 
-  @property({
-    type: 'number',
-    required: true,
-  })
+  @belongsTo(() => Remission)
   remissionNumId: number;
 
   @belongsTo(() => Client)

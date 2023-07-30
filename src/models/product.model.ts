@@ -3,19 +3,21 @@ import {Sale} from './sale.model';
 import {ProductSale} from './product-sale.model';
 import {Packing} from './packing.model';
 
-@model({
-  settings: {
-    foreignKeys:
-    {
-      fk_product_packingId: {
-        name: "fk_product_packingId",
-        entity: "Packing",
-        entityKey: "id",
-        foreignKey: "packingId",
-      }
-    },
-  }
-})
+@model(
+// {
+//   settings: {
+//     foreignKeys:
+//     {
+//       fk_product_packingId: {
+//         name: "fk_product_packingId",
+//         entity: "Packing",
+//         entityKey: "id",
+//         foreignKey: "packingId",
+//       }
+//     },
+//   }
+// }
+)
 export class Product extends Entity {
   @property({
     type: 'number',
@@ -52,7 +54,7 @@ export class Product extends Entity {
   sales: Sale[];
 
   @belongsTo(() => Packing)
-  packingId: number;
+  packingId?: number;
 
   @hasMany(() => ProductSale)
   productSales: ProductSale[];

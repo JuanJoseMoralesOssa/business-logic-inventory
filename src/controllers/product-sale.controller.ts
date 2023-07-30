@@ -2,109 +2,149 @@ import {
   Count,
   CountSchema,
   Filter,
+  FilterExcludingWhere,
   repository,
   Where,
 } from '@loopback/repository';
-  import {
-  del,
+import {
+  post,
+  param,
   get,
   getModelSchemaRef,
-  getWhereSchemaFor,
-  param,
   patch,
-  post,
+  put,
+  del,
   requestBody,
+  response,
 } from '@loopback/rest';
-import {
-Product,
-ProductSale,
-Sale,
-} from '../models';
-import {ProductRepository} from '../repositories';
+import {ProductSale} from '../models';
+import {ProductSaleRepository} from '../repositories';
 
 export class ProductSaleController {
   constructor(
-    @repository(ProductRepository) protected productRepository: ProductRepository,
-  ) { }
+    @repository(ProductSaleRepository)
+    public productSaleRepository : ProductSaleRepository,
+  ) {}
 
-  @get('/products/{id}/sales', {
-    responses: {
-      '200': {
-        description: 'Array of Product has many Sale through ProductSale',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(Sale)},
-          },
+  @post('/product-sales')
+  @response(200, {
+    description: 'ProductSale model instance',
+    content: {'application/json': {schema: getModelSchemaRef(ProductSale)}},
+  })
+  async create(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(ProductSale, {
+            title: 'NewProductSale',
+            exclude: ['id'],
+          }),
+        },
+      },
+    })
+    productSale: Omit<ProductSale, 'id'>,
+  ): Promise<ProductSale> {
+    return this.productSaleRepository.create(productSale);
+  }
+
+  @get('/product-sales/count')
+  @response(200, {
+    description: 'ProductSale model count',
+    content: {'application/json': {schema: CountSchema}},
+  })
+  async count(
+    @param.where(ProductSale) where?: Where<ProductSale>,
+  ): Promise<Count> {
+    return this.productSaleRepository.count(where);
+  }
+
+  @get('/product-sales')
+  @response(200, {
+    description: 'Array of ProductSale model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(ProductSale, {includeRelations: true}),
         },
       },
     },
   })
   async find(
-    @param.path.number('id') id: number,
-    @param.query.object('filter') filter?: Filter<Sale>,
-  ): Promise<Sale[]> {
-    return this.productRepository.sales(id).find(filter);
+    @param.filter(ProductSale) filter?: Filter<ProductSale>,
+  ): Promise<ProductSale[]> {
+    return this.productSaleRepository.find(filter);
   }
 
-  @post('/products/{id}/sales', {
-    responses: {
-      '200': {
-        description: 'create a Sale model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Sale)}},
-      },
-    },
+  @patch('/product-sales')
+  @response(200, {
+    description: 'ProductSale PATCH success count',
+    content: {'application/json': {schema: CountSchema}},
   })
-  async create(
-    @param.path.number('id') id: typeof Product.prototype.id,
+  async updateAll(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Sale, {
-            title: 'NewSaleInProduct',
-            exclude: ['id'],
-          }),
-        },
-      },
-    }) sale: Omit<Sale, 'id'>,
-  ): Promise<Sale> {
-    return this.productRepository.sales(id).create(sale);
-  }
-
-  @patch('/products/{id}/sales', {
-    responses: {
-      '200': {
-        description: 'Product.Sale PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async patch(
-    @param.path.number('id') id: number,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Sale, {partial: true}),
+          schema: getModelSchemaRef(ProductSale, {partial: true}),
         },
       },
     })
-    sale: Partial<Sale>,
-    @param.query.object('where', getWhereSchemaFor(Sale)) where?: Where<Sale>,
+    productSale: ProductSale,
+    @param.where(ProductSale) where?: Where<ProductSale>,
   ): Promise<Count> {
-    return this.productRepository.sales(id).patch(sale, where);
+    return this.productSaleRepository.updateAll(productSale, where);
   }
 
-  @del('/products/{id}/sales', {
-    responses: {
-      '200': {
-        description: 'Product.Sale DELETE success count',
-        content: {'application/json': {schema: CountSchema}},
+  @get('/product-sales/{id}')
+  @response(200, {
+    description: 'ProductSale model instance',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(ProductSale, {includeRelations: true}),
       },
     },
   })
-  async delete(
+  async findById(
     @param.path.number('id') id: number,
-    @param.query.object('where', getWhereSchemaFor(Sale)) where?: Where<Sale>,
-  ): Promise<Count> {
-    return this.productRepository.sales(id).delete(where);
+    @param.filter(ProductSale, {exclude: 'where'}) filter?: FilterExcludingWhere<ProductSale>
+  ): Promise<ProductSale> {
+    return this.productSaleRepository.findById(id, filter);
+  }
+
+  @patch('/product-sales/{id}')
+  @response(204, {
+    description: 'ProductSale PATCH success',
+  })
+  async updateById(
+    @param.path.number('id') id: number,
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(ProductSale, {partial: true}),
+        },
+      },
+    })
+    productSale: ProductSale,
+  ): Promise<void> {
+    await this.productSaleRepository.updateById(id, productSale);
+  }
+
+  @put('/product-sales/{id}')
+  @response(204, {
+    description: 'ProductSale PUT success',
+  })
+  async replaceById(
+    @param.path.number('id') id: number,
+    @requestBody() productSale: ProductSale,
+  ): Promise<void> {
+    await this.productSaleRepository.replaceById(id, productSale);
+  }
+
+  @del('/product-sales/{id}')
+  @response(204, {
+    description: 'ProductSale DELETE success',
+  })
+  async deleteById(@param.path.number('id') id: number): Promise<void> {
+    await this.productSaleRepository.deleteById(id);
   }
 }

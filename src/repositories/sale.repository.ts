@@ -27,10 +27,14 @@ export class SaleRepository extends DefaultCrudRepository<
 
   public readonly productSales: HasManyRepositoryFactory<ProductSale, typeof Sale.prototype.id>;
 
+  public readonly remissionNum: BelongsToAccessor<Remission, typeof Sale.prototype.id>;
+
   constructor(
     @inject('datasources.mysql') dataSource: MysqlDataSource, @repository.getter('ClientRepository') protected clientRepositoryGetter: Getter<ClientRepository>, @repository.getter('ProductSaleRepository') protected productSaleRepositoryGetter: Getter<ProductSaleRepository>, @repository.getter('ProductRepository') protected productRepositoryGetter: Getter<ProductRepository>, @repository.getter('BillRepository') protected billRepositoryGetter: Getter<BillRepository>, @repository.getter('RemissionRepository') protected remissionRepositoryGetter: Getter<RemissionRepository>,
   ) {
     super(Sale, dataSource);
+    this.remissionNum = this.createBelongsToAccessorFor('remissionNum', remissionRepositoryGetter,);
+    this.registerInclusionResolver('remissionNum', this.remissionNum.inclusionResolver);
     this.productSales = this.createHasManyRepositoryFactoryFor('productSales', productSaleRepositoryGetter,);
     this.registerInclusionResolver('productSales', this.productSales.inclusionResolver);
     this.remission = this.createBelongsToAccessorFor('remission', remissionRepositoryGetter,);
