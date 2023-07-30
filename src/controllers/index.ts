@@ -14,3 +14,8 @@ export * from './packing.controller';
 export * from './product.controller';
 export * from './remission.controller';
 export * from './sale.controller';
+export * from './product-packing.controller';
+export * from './product-sale-sale.controller';
+export * from './product-sale-product.controller';
+export * from './sale-product-sale.controller';
+export * from './product-product-sale.controller';

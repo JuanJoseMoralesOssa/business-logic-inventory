@@ -1,18 +1,19 @@
-import {Entity, model, property, hasMany} from '@loopback/repository';
+import {Entity, model, property, hasMany, belongsTo} from '@loopback/repository';
 import {Sale} from './sale.model';
 import {ProductSale} from './product-sale.model';
+import {Packing} from './packing.model';
 
 @model({
   settings: {
     foreignKeys:
-      {
-        fk_product_packingId: {
-          name: "fk_product_packingId",
-          entity: "Packing",
-          entityKey: "id",
-          foreignKey: "packingId",
-        }
-      },
+    {
+      fk_product_packingId: {
+        name: "fk_product_packingId",
+        entity: "Packing",
+        entityKey: "id",
+        foreignKey: "packingId",
+      }
+    },
   }
 })
 export class Product extends Entity {
@@ -50,10 +51,11 @@ export class Product extends Entity {
   @hasMany(() => Sale, {through: {model: () => ProductSale}})
   sales: Sale[];
 
-  @property({
-    type: 'number',
-  })
-  packingId?: number;
+  @belongsTo(() => Packing)
+  packingId: number;
+
+  @hasMany(() => ProductSale)
+  productSales: ProductSale[];
 
   constructor(data?: Partial<Product>) {
     super(data);

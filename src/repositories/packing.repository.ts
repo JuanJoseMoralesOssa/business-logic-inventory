@@ -1,5 +1,5 @@
 import {inject, Getter} from '@loopback/core';
-import {DefaultCrudRepository, repository, HasManyRepositoryFactory} from '@loopback/repository';
+import {DefaultCrudRepository, repository, HasManyRepositoryFactory, HasOneRepositoryFactory} from '@loopback/repository';
 import {MysqlDataSource} from '../datasources';
 import {Packing, PackingRelations, Product} from '../models';
 import {ProductRepository} from './product.repository';

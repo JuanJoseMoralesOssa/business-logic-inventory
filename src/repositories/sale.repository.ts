@@ -1,5 +1,5 @@
 import {inject, Getter} from '@loopback/core';
-import {DefaultCrudRepository, repository, BelongsToAccessor, HasManyThroughRepositoryFactory} from '@loopback/repository';
+import {DefaultCrudRepository, repository, BelongsToAccessor, HasManyThroughRepositoryFactory, HasManyRepositoryFactory} from '@loopback/repository';
 import {MysqlDataSource} from '../datasources';
 import {Sale, SaleRelations, Client, Product, ProductSale, Bill, Remission} from '../models';
 import {ClientRepository} from './client.repository';
@@ -25,10 +25,14 @@ export class SaleRepository extends DefaultCrudRepository<
 
   public readonly remission: BelongsToAccessor<Remission, typeof Sale.prototype.id>;
 
+  public readonly productSales: HasManyRepositoryFactory<ProductSale, typeof Sale.prototype.id>;
+
   constructor(
     @inject('datasources.mysql') dataSource: MysqlDataSource, @repository.getter('ClientRepository') protected clientRepositoryGetter: Getter<ClientRepository>, @repository.getter('ProductSaleRepository') protected productSaleRepositoryGetter: Getter<ProductSaleRepository>, @repository.getter('ProductRepository') protected productRepositoryGetter: Getter<ProductRepository>, @repository.getter('BillRepository') protected billRepositoryGetter: Getter<BillRepository>, @repository.getter('RemissionRepository') protected remissionRepositoryGetter: Getter<RemissionRepository>,
   ) {
     super(Sale, dataSource);
+    this.productSales = this.createHasManyRepositoryFactoryFor('productSales', productSaleRepositoryGetter,);
+    this.registerInclusionResolver('productSales', this.productSales.inclusionResolver);
     this.remission = this.createBelongsToAccessorFor('remission', remissionRepositoryGetter,);
     this.registerInclusionResolver('remission', this.remission.inclusionResolver);
     this.bill = this.createBelongsToAccessorFor('bill', billRepositoryGetter,);

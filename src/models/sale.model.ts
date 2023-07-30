@@ -47,7 +47,7 @@ export class Sale extends Entity {
     type: 'number',
     required: true,
   })
-  remission: number;
+  remissionNumId: number;
 
   @belongsTo(() => Client)
   clientId: number;
@@ -60,6 +60,9 @@ export class Sale extends Entity {
 
   @belongsTo(() => Remission)
   remissionId: number;
+
+  @hasMany(() => ProductSale)
+  productSales: ProductSale[];
 
   constructor(data?: Partial<Sale>) {
     super(data);

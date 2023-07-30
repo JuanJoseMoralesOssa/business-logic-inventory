@@ -1,4 +1,6 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Sale} from './sale.model';
+import {Product} from './product.model';
 
 @model({
   settings: {
@@ -42,17 +44,13 @@ export class ProductSale extends Entity {
     type: 'boolean',
     required: true,
   })
-  IsBorrowed: boolean;
+  isBorrowed: boolean;
 
-  @property({
-    type: 'number',
-  })
-  productId?: number;
+  @belongsTo(() => Sale)
+  saleId: number;
 
-  @property({
-    type: 'number',
-  })
-  saleId?: number;
+  @belongsTo(() => Product)
+  productId: number;
 
   constructor(data?: Partial<ProductSale>) {
     super(data);
