@@ -19,6 +19,7 @@ import {
 } from '@loopback/rest';
 import {Remission} from '../models';
 import {RemissionRepository} from '../repositories';
+import {log} from 'console';
 
 export class RemissionController {
   constructor(
@@ -74,6 +75,28 @@ export class RemissionController {
     @param.filter(Remission) filter?: Filter<Remission>,
   ): Promise<Remission[]> {
     return this.remissionRepository.find(filter);
+  }
+
+  @get('/remission-relations')
+  @response(200, {
+    description: 'Array of Remission model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Remission, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findWithRelations(
+  ): Promise<Remission[]> {
+      return this.remissionRepository.find(
+      {
+        include: [
+          {relation: "sale"},
+        ]
+      });
   }
 
   @patch('/remission')

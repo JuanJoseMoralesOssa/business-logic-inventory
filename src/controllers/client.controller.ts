@@ -7,13 +7,13 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
@@ -74,6 +74,28 @@ export class ClientController {
     @param.filter(Client) filter?: Filter<Client>,
   ): Promise<Client[]> {
     return this.clientRepository.find(filter);
+  }
+
+  @get('/client-relations')
+  @response(200, {
+    description: 'Array of Client model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Client, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findWithRelations(
+  ): Promise<Client[]> {
+    return this.clientRepository.find(
+      {
+        include: [
+          {relation: "sales"}
+        ]
+      });
   }
 
   @patch('/client')

@@ -76,6 +76,33 @@ export class SaleController {
     return this.saleRepository.find(filter);
   }
 
+  @get('/sale-relations')
+  @response(200, {
+    description: 'Array of Sale model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Sale, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findWithRelations(
+  ): Promise<Sale[]> {
+    return this.saleRepository.find(
+      {
+        include: [
+          {relation: "remissionNum"},
+          {relation: "remission"},
+          {relation: "productSales", scope: {include: [{relation: "product"}]}},
+          {relation: "bill"},
+          {relation: "client"},
+          {relation: "products"},
+        ]
+      });
+  }
+
   @patch('/sale')
   @response(200, {
     description: 'Sale PATCH success count',

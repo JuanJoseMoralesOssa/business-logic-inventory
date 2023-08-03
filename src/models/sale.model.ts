@@ -1,8 +1,8 @@
-import {Entity, model, property, belongsTo, hasMany} from '@loopback/repository';
-import {Client} from './client.model';
-import {Product} from './product.model';
-import {ProductSale} from './product-sale.model';
+import {Entity, belongsTo, hasMany, model, property} from '@loopback/repository';
 import {Bill} from './bill.model';
+import {Client} from './client.model';
+import {ProductSale} from './product-sale.model';
+import {Product} from './product.model';
 import {Remission} from './remission.model';
 
 @model({
@@ -25,12 +25,14 @@ import {Remission} from './remission.model';
         entity: "Bill",
         entityKey: "id",
         foreignKey: "billId",
+        default: null,
       },
       fk_sale_remissionId: {
         name: "fk_sale_remissionId",
         entity: "Remission",
         entityKey: "id",
         foreignKey: "remissionId",
+        default: null,
       },
     }
   }
@@ -59,10 +61,10 @@ export class Sale extends Entity {
   products: Product[];
 
   @belongsTo(() => Bill)
-  billId: number;
+  billId?: number;
 
   @belongsTo(() => Remission)
-  remissionId: number;
+  remissionId?: number;
 
   @hasMany(() => ProductSale)
   productSales: ProductSale[];

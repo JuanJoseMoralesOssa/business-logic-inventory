@@ -76,6 +76,27 @@ export class BillController {
     return this.billRepository.find(filter);
   }
 
+  @get('/bill-relations')
+  @response(200, {
+    description: 'Array of Bill model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Bill, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findWithRelations(): Promise<Bill[]> {
+    return this.billRepository.find(
+      {
+        include: [
+          {relation: "sale"}
+        ]
+      });
+  }
+
   @patch('/bill')
   @response(200, {
     description: 'Bill PATCH success count',

@@ -76,6 +76,28 @@ export class PackingController {
     return this.packingRepository.find(filter);
   }
 
+  @get('/packing-relations')
+  @response(200, {
+    description: 'Array of Packing model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Packing, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findWithRelations(
+  ): Promise<Packing[]> {
+    return this.packingRepository.find(
+      {
+        include: [
+          {relation: "products"}
+        ]
+      });
+  }
+
   @patch('/packing')
   @response(200, {
     description: 'Packing PATCH success count',

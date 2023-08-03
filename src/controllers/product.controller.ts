@@ -76,6 +76,30 @@ export class ProductController {
     return this.productRepository.find(filter);
   }
 
+  @get('/product-relations')
+  @response(200, {
+    description: 'Array of Product model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Product, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findWithRelations(
+  ): Promise<Product[]> {
+    return this.productRepository.find(
+      {
+        include: [
+          {relation: "productSales"},
+          {relation: "packing"},
+          {relation: "sales"},
+        ]
+      });
+  }
+
   @patch('/product')
   @response(200, {
     description: 'Product PATCH success count',
