@@ -94,7 +94,6 @@ export class ProductController {
       {
         include: [
           {relation: "productSales"},
-          {relation: "packing"},
           {relation: "sales"},
         ]
       });
