@@ -17,7 +17,7 @@ export class Client extends Entity {
   clientName: string;
 
   @hasMany(() => Sale)
-  sales: Sale[];
+  sales?: Sale[];
 
   constructor(data?: Partial<Client>) {
     super(data);

@@ -1,7 +1,6 @@
-import {Entity, model, property, hasMany, belongsTo} from '@loopback/repository';
+import {Entity, model, property, hasMany} from '@loopback/repository';
 import {Sale} from './sale.model';
 import {ProductSale} from './product-sale.model';
-import {Packing} from './packing.model';
 
 @model(
 // {
@@ -42,19 +41,10 @@ export class Product extends Entity {
     type: 'number',
     required: true,
   })
-  totalQuantity: number;
-
-  @property({
-    type: 'number',
-    required: true,
-  })
   totalWeight: number;
 
   @hasMany(() => Sale, {through: {model: () => ProductSale}})
   sales: Sale[];
-
-  @belongsTo(() => Packing)
-  packingId?: number;
 
   @hasMany(() => ProductSale)
   productSales: ProductSale[];
