@@ -31,12 +31,7 @@ export class ProductSale extends Entity {
   @property({
     type: 'number',
     required: true,
-  })
-  quantity: number;
-
-  @property({
-    type: 'number',
-    required: true,
+    dataType: 'float'
   })
   weight: number;
 
