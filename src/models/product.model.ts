@@ -2,21 +2,7 @@ import {Entity, model, property, hasMany} from '@loopback/repository';
 import {Sale} from './sale.model';
 import {ProductSale} from './product-sale.model';
 
-@model(
-// {
-//   settings: {
-//     foreignKeys:
-//     {
-//       fk_product_packingId: {
-//         name: "fk_product_packingId",
-//         entity: "Packing",
-//         entityKey: "id",
-//         foreignKey: "packingId",
-//       }
-//     },
-//   }
-// }
-)
+@model()
 export class Product extends Entity {
   @property({
     type: 'number',
@@ -40,7 +26,7 @@ export class Product extends Entity {
   @property({
     type: 'number',
     required: true,
-    dataType: 'float'
+    dataType: 'float',
   })
   totalWeight: number;
 

@@ -7,23 +7,29 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
-import {Sale} from '../models';
-import {SaleRepository} from '../repositories';
+import {Remission, Sale, SaleDefault} from '../models';
+import {BillRepository, ClientRepository, RemissionRepository, SaleRepository} from '../repositories';
 
 export class SaleController {
   constructor(
     @repository(SaleRepository)
-    public saleRepository : SaleRepository,
+    public saleRepository: SaleRepository,
+    @repository(RemissionRepository)
+    public remissionRepository: RemissionRepository,
+    @repository(ClientRepository)
+    public clientRepository: ClientRepository,
+    @repository(BillRepository)
+    public billRepository: BillRepository,
   ) {}
 
   @post('/sale')
@@ -44,6 +50,185 @@ export class SaleController {
     })
     sale: Omit<Sale, 'id'>,
   ): Promise<Sale> {
+    return this.saleRepository.create(sale);
+  }
+
+  @post('/sale-default')
+  @response(200, {
+    description: 'Sale default model instance',
+    content: {'application/json': {schema: getModelSchemaRef(SaleDefault)}},
+  })
+  async createDefault(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(SaleDefault, {
+            title: 'NewSaleDefault',
+            exclude: ['id'],
+          }),
+        },
+      },
+    })
+    sale: Omit<SaleDefault, 'id'>,
+  ): Promise<SaleDefault> {
+    let remm: Remission;
+
+    if (sale.saleDate && sale.remissionNumId && sale.clientId) {
+      if (!sale.bill?.bill && !sale.remission?.remission)  {
+        if (!sale.billId && !sale.remissionId) {
+          const newSale = {
+            saleDate: sale.saleDate,
+            remissionNumId: sale.remissionNumId,
+            clientId: sale.clientId,
+          }
+          return this.saleRepository.create(newSale);
+        } else if (sale.billId) {
+          const newSale = {
+            saleDate: sale.saleDate,
+            remissionNumId: sale.remissionNumId,
+            clientId: sale.clientId,
+            billId: sale.billId
+          }
+          return this.saleRepository.create(newSale);
+        } else if (sale.remissionId) {
+          const newSale = {
+            saleDate: sale.saleDate,
+            remissionNumId: sale.remissionNumId,
+            clientId: sale.clientId,
+            remissionId: sale.remissionId
+          }
+          return this.saleRepository.create(newSale);
+        }
+      } else if (sale.bill?.bill) {
+        const bill = await this.billRepository.create({
+          bill: sale.bill.bill
+        });
+        const newSale = {
+          saleDate: sale.saleDate,
+          remissionNumId: sale.remissionNumId,
+          clientId: sale.clientId,
+          billId: bill.id,
+        }
+        return this.saleRepository.create(newSale);
+      } else if (sale.remission?.remission) {
+        let rem = await (this.remissionRepository.findOne({
+          where: {id: sale.remissionNumId}
+        }))
+        if (rem?.remission != sale.remission?.remission) {
+          const remission = await this.remissionRepository.create({
+            remission: sale.remission.remission
+          });
+          const newSale = {
+          saleDate: sale.saleDate,
+          remissionNumId: sale.remissionNumId,
+          clientId: sale.clientId,
+          remissionId: remission.id,
+          }
+          return this.saleRepository.create(newSale);
+        }
+        const newSale = {
+          saleDate: sale.saleDate,
+          remissionNumId: sale.remissionNumId,
+          clientId: sale.clientId,
+          remissionId: sale.remissionNumId,
+        }
+        return this.saleRepository.create(newSale);
+      }
+    }
+
+
+    if (sale.saleDate) {
+      if (!sale.remissionNumId && !sale.clientId) {
+        if (sale.remissionNum?.remission && sale.client?.clientName) {
+          remm = await this.remissionRepository.create({
+            remission: sale.remissionNum.remission,
+          })
+          sale.remissionNumId = remm.id;
+
+          sale.clientId = await (await this.clientRepository.create({
+            clientName: sale.client.clientName,
+          })).getId();
+        }
+      }
+
+      if (!sale.remissionNumId && sale.clientId) {
+        if (sale.remissionNum?.remission) {
+          remm = await this.remissionRepository.create({
+            remission: sale.remissionNum.remission,
+          })
+          sale.remissionNumId = remm.id;
+        }
+      }
+
+      if (sale.remissionNumId && !sale.clientId) {
+        if (sale.client?.clientName) {
+          sale.clientId = await (await this.clientRepository.create({
+            clientName: sale.client.clientName,
+          })).getId();
+        }
+      }
+
+      if (!sale.bill?.bill && !sale.remission?.remission)  {
+            if (!sale.billId && !sale.remissionId) {
+              const newSale = {
+                saleDate: sale.saleDate,
+                remissionNumId: sale.remissionNumId,
+                clientId: sale.clientId,
+              }
+              return this.saleRepository.create(newSale);
+            } else if (sale.billId) {
+              const newSale = {
+                saleDate: sale.saleDate,
+                remissionNumId: sale.remissionNumId,
+                clientId: sale.clientId,
+                billId: sale.billId
+              }
+              return this.saleRepository.create(newSale);
+            } else if (sale.remissionId) {
+              const newSale = {
+                saleDate: sale.saleDate,
+                remissionNumId: sale.remissionNumId,
+                clientId: sale.clientId,
+                remissionId: sale.remissionId
+              }
+              return this.saleRepository.create(newSale);
+            }
+          } else if (sale.bill?.bill) {
+            const bill = await this.billRepository.create({
+              bill: sale.bill.bill
+            })
+            const newSale = {
+              saleDate: sale.saleDate,
+              remissionNumId: sale.remissionNumId,
+              clientId: sale.clientId,
+              billId: bill.id,
+            }
+            return this.saleRepository.create(newSale);
+          } else if (sale.remission?.remission) {
+            let remm = await (this.remissionRepository.findOne({
+              where: {id: sale.remissionNumId}
+            }))
+            if (remm?.remission != sale.remission?.remission) {
+              const remission = await this.remissionRepository.create({
+                remission: sale.remission.remission
+              });
+              const newSale = {
+                saleDate: sale.saleDate,
+                remissionNumId: sale.remissionNumId,
+                clientId: sale.clientId,
+                remissionId: remission.id,
+              }
+              return this.saleRepository.create(newSale);
+            }
+        const newSale = {
+          saleDate: sale.saleDate,
+          remissionNumId: sale.remissionNumId,
+          clientId: sale.clientId,
+          remissionId: sale?.remissionNumId,
+        }
+        return this.saleRepository.create(newSale);
+      }
+    }
     return this.saleRepository.create(sale);
   }
 
@@ -165,6 +350,95 @@ export class SaleController {
     @requestBody() sale: Sale,
   ): Promise<void> {
     await this.saleRepository.replaceById(id, sale);
+  }
+
+  @put('/sale-default/{id}')
+  @response(204, {
+    description: 'Sale default PUT success',
+  })
+  async replaceDefaultById(
+    @param.path.number('id') id: number,
+    @requestBody() sale: SaleDefault,
+  ): Promise<void> {
+
+    if (!sale.remissionNumId) {
+      if (sale.remissionNum?.remission) {
+        let remNum = await this.remissionRepository.create({
+          remission: sale.remissionNum.remission
+        });
+        sale.remissionNumId = remNum.id;
+      }
+    }
+
+    if (!sale.clientId) {
+      if (sale.client?.clientName) {
+        let client = await this.clientRepository.create({
+          clientName: sale.client.clientName
+        });
+        sale.clientId = client.id;
+      }
+    }
+
+    if (!sale.billId && sale.bill?.bill) {
+      const bill = await this.billRepository.create({
+        bill: sale.bill.bill,
+      });
+      const newSale = {
+        saleDate: sale.saleDate,
+        remissionNumId: sale.remissionNumId,
+        clientId: sale.clientId,
+        billId: bill.id,
+      }
+      await this.saleRepository.replaceById(id, newSale);
+
+    } else if (!sale.remissionId && sale.remission?.remission) {
+
+      let remission = await this.remissionRepository.
+      findOne({
+        where: {remission : sale.remissionNumId}
+      });
+
+      if (remission) {
+        if (remission.remission == sale.remission?.remission) {
+          const newSale = {
+            saleDate: sale.saleDate,
+            remissionNumId: sale.remissionNumId,
+            clientId: sale.clientId,
+            remissionId: sale.remissionNumId,
+          }
+          await this.saleRepository.replaceById(id, newSale);
+        }
+      }
+
+      remission = await this.remissionRepository.create({
+        remission: sale.remission.remission,
+      });
+      const newSale = {
+        saleDate: sale.saleDate,
+        remissionNumId: sale.remissionNumId,
+        clientId: sale.clientId,
+        remissionId: remission.id,
+      }
+      await this.saleRepository.replaceById(id, newSale);
+    }
+
+    if (sale.billId) {
+      const newSale = {
+        saleDate: sale.saleDate,
+        remissionNumId: sale.remissionNumId,
+        clientId: sale.clientId,
+        billId: sale.billId,
+      }
+      await this.saleRepository.replaceById(id, newSale);
+    } else if (sale.remissionId) {
+      const newSale = {
+        saleDate: sale.saleDate,
+        remissionNumId: sale.remissionNumId,
+        clientId: sale.clientId,
+        remissionId: sale.remissionId,
+      }
+      await this.saleRepository.replaceById(id, newSale);
+    }
   }
 
   @del('/sale/{id}')
