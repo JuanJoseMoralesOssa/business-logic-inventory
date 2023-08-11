@@ -74,7 +74,6 @@ export class ProductController {
     @param.filter(Product) filter?: Filter<Product>,
   ): Promise<Product[]> {
     if (filter) {
-      filter.order = ['productName']
       return this.productRepository.find(filter);
     } else {
       return this.productRepository.find({

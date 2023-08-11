@@ -74,7 +74,6 @@ export class ClientController {
     @param.filter(Client) filter?: Filter<Client>,
   ): Promise<Client[]> {
     if (filter) {
-      filter.order = ['clientName']
       return this.clientRepository.find(filter);
     } else {
       return this.clientRepository.find({
