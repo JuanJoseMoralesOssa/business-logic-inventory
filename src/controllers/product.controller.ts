@@ -73,7 +73,14 @@ export class ProductController {
   async find(
     @param.filter(Product) filter?: Filter<Product>,
   ): Promise<Product[]> {
-    return this.productRepository.find(filter);
+    if (filter) {
+      filter.order = ['productName']
+      return this.productRepository.find(filter);
+    } else {
+      return this.productRepository.find({
+        order: ['productName']
+      });
+    }
   }
 
   @get('/product-relations')
@@ -92,6 +99,7 @@ export class ProductController {
   ): Promise<Product[]> {
     return this.productRepository.find(
       {
+        order: ['productName'],
         include: [
           {relation: "productSales"},
           {relation: "sales"},

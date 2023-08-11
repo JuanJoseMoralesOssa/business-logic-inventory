@@ -73,7 +73,14 @@ export class ClientController {
   async find(
     @param.filter(Client) filter?: Filter<Client>,
   ): Promise<Client[]> {
-    return this.clientRepository.find(filter);
+    if (filter) {
+      filter.order = ['clientName']
+      return this.clientRepository.find(filter);
+    } else {
+      return this.clientRepository.find({
+        order: ['clientName'],
+      });
+    }
   }
 
   @get('/client-relations')
@@ -92,6 +99,7 @@ export class ClientController {
   ): Promise<Client[]> {
     return this.clientRepository.find(
       {
+        order: ['clientName'],
         include: [
           {relation: "sales"}
         ]
