@@ -369,6 +369,13 @@ export class SaleController {
         });
         sale.remissionNumId = remNum.id;
       }
+    } else if(sale.remissionNumId) {
+      if (sale.remissionNum?.remission) {
+        let remNum = await this.remissionRepository.findById(sale.remissionNumId);
+        if (sale.remissionNum.remission !== remNum.remission) {
+          sale.remissionNumId = remNum.id;
+        }
+      }
     }
 
     if (!sale.clientId) {
