@@ -418,14 +418,15 @@ export class SaleController {
         }
       }
 
-      remission = await this.remissionRepository.create({
-        remission: sale.remission.remission,
-      });
+
+      // remission = await this.remissionRepository.create({
+      //   remission: sale.remission.remission,
+      // });
       const newSale = {
         saleDate: sale.saleDate,
         remissionNumId: sale.remissionNumId,
         clientId: sale.clientId,
-        remissionId: remission.id,
+        remissionId: sale.remissionNumId, //remission.id
       }
       await this.saleRepository.replaceById(id, newSale);
     }
