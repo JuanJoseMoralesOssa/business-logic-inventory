@@ -277,6 +277,7 @@ export class SaleController {
   ): Promise<Sale[]> {
     return this.saleRepository.find(
       {
+        order: ['id DESC'],
         include: [
           {relation: "remissionNum"},
           {relation: "remission"},
