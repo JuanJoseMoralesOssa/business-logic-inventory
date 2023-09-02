@@ -487,7 +487,7 @@ export class SaleController {
           between: [saleFiltered.startDate, saleFiltered.endDate],
         },
       },
-      order: ['saleDate'],
+      order: ['saleDate', 'remissionNum'],
       include: [
         {relation: 'remissionNum'},
         {relation: 'remission'},
