@@ -17,7 +17,7 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
-import {Remission, Sale, SaleDefault} from '../models';
+import {FilteredSaleDate, Remission, Sale, SaleDefault} from '../models';
 import {BillRepository, ClientRepository, RemissionRepository, SaleRepository} from '../repositories';
 
 export class SaleController {
@@ -457,4 +457,51 @@ export class SaleController {
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.saleRepository.deleteById(id);
   }
+
+
+  @post('/sale-filtered')
+  @response(200, {
+    description: 'Array of Sales with filter model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Sale, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findRelationsWithFilter(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(FilteredSaleDate),
+        },
+      },
+    })
+    saleFiltered: FilteredSaleDate
+  ): Promise<Sale[]>{
+    let sales = this.saleRepository.find({
+      where: {
+        saleDate: {
+          between: [saleFiltered.startDate, saleFiltered.endDate],
+        },
+      },
+      order: ['saleDate'],
+      include: [
+        {relation: 'remissionNum'},
+        {relation: 'remission'},
+        {relation: 'productSales', scope: {include: [{relation: 'product'}]}},
+        {relation: 'bill'},
+        {relation: 'client'},
+        {relation: 'products'},
+      ],
+    });
+
+    if (sales) {
+      return sales
+    }
+    return []
+  }
+
 }
