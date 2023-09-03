@@ -10,6 +10,7 @@ import {
   del,
   get,
   getModelSchemaRef,
+  HttpErrors,
   param,
   patch,
   post,
@@ -70,7 +71,7 @@ export class SaleController {
       },
     })
     sale: Omit<SaleDefault, 'id'>,
-  ): Promise<SaleDefault> {
+  ): Promise<object>  {
     let remm: Remission;
 
     if (sale.saleDate && sale.remissionNumId && sale.clientId) {
@@ -81,7 +82,6 @@ export class SaleController {
             remissionNumId: sale.remissionNumId,
             clientId: sale.clientId,
           }
-          return this.saleRepository.create(newSale);
         } else if (sale.billId) {
           const newSale = {
             saleDate: sale.saleDate,
@@ -168,14 +168,16 @@ export class SaleController {
         }
       }
 
-      if (!sale.bill?.bill && !sale.remission?.remission)  {
-            if (!sale.billId && !sale.remissionId) {
+      if (sale?.saleDate && sale?.remissionNumId && sale?.clientId ) {
+        if (!sale.bill?.bill && !sale.remission?.remission)  {
+          if (!sale.billId && !sale.remissionId) {
               const newSale = {
-                saleDate: sale.saleDate,
-                remissionNumId: sale.remissionNumId,
-                clientId: sale.clientId,
+                  saleDate: sale.saleDate,
+                  remissionNumId: sale.remissionNumId,
+                  clientId: sale.clientId,
+                }
+                return this.saleRepository.create(newSale);
               }
-              return this.saleRepository.create(newSale);
             } else if (sale.billId) {
               const newSale = {
                 saleDate: sale.saleDate,
@@ -229,7 +231,7 @@ export class SaleController {
         return this.saleRepository.create(newSale);
       }
     }
-    return this.saleRepository.create(sale);
+    return new HttpErrors[401]("Datos para la venta incorrectos. ")
   }
 
   @get('/sale/count')
@@ -397,7 +399,7 @@ export class SaleController {
         clientId: sale.clientId,
         billId: bill.id,
       }
-      await this.saleRepository.replaceById(id, newSale);
+      return await this.saleRepository.replaceById(id, newSale);
 
     } else if (!sale.remissionId && sale.remission?.remission) {
 
@@ -414,7 +416,7 @@ export class SaleController {
             clientId: sale.clientId,
             remissionId: sale.remissionNumId,
           }
-          await this.saleRepository.replaceById(id, newSale);
+          return await this.saleRepository.replaceById(id, newSale);
         }
       }
 
@@ -428,7 +430,7 @@ export class SaleController {
         clientId: sale.clientId,
         remissionId: sale.remissionNumId, //remission.id
       }
-      await this.saleRepository.replaceById(id, newSale);
+      return await this.saleRepository.replaceById(id, newSale);
     }
 
     if (sale.billId) {
@@ -438,7 +440,7 @@ export class SaleController {
         clientId: sale.clientId,
         billId: sale.billId,
       }
-      await this.saleRepository.replaceById(id, newSale);
+      return await this.saleRepository.replaceById(id, newSale);
     } else if (sale.remissionId) {
       const newSale = {
         saleDate: sale.saleDate,
@@ -446,7 +448,15 @@ export class SaleController {
         clientId: sale.clientId,
         remissionId: sale.remissionId,
       }
-      await this.saleRepository.replaceById(id, newSale);
+      return await this.saleRepository.replaceById(id, newSale);
+    }
+    if (sale.saleDate && sale.remissionNumId && sale.clientId) {
+      const newSale = {
+        saleDate: sale.saleDate,
+        remissionNumId: sale.remissionNumId,
+        clientId: sale.clientId,
+      }
+      return await this.saleRepository.replaceById(id, newSale);
     }
   }
 
@@ -487,9 +497,9 @@ export class SaleController {
           between: [saleFiltered.startDate, saleFiltered.endDate],
         },
       },
-      order: ['saleDate', 'remissionNum'],
+      order: ['saleDate'],
       include: [
-        {relation: 'remissionNum'},
+        {relation: 'remissionNum', scope: {order: ['remission']}},
         {relation: 'remission'},
         {relation: 'productSales', scope: {include: [{relation: 'product'}]}},
         {relation: 'bill'},
